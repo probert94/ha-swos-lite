@@ -45,7 +45,7 @@ class MikrotikSwosLiteConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=host): str,
-                    vol.Required(CONF_USERNAME): str,
+                    vol.Required(CONF_USERNAME, default="admin"): str,
                     vol.Required(CONF_PASSWORD): str,
                 }
             ),
