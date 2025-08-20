@@ -12,12 +12,17 @@ from python_swos_lite.endpoints.sys import SystemEndpoint
 from python_swos_lite.http import createHttpClient
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
+    CONF_USERNAME,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN
+from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .errors import AuthError, CannotConnect
 from .port import Port
 
@@ -67,7 +72,11 @@ class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
             _LOGGER,
             config_entry=config_entry,
             name=f"{DOMAIN} - {config_entry.data[CONF_HOST]}",
-            update_interval=timedelta(seconds=5),
+            update_interval=timedelta(
+                seconds=config_entry.data.get(
+                    CONF_SCAN_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                )
+            ),
         )
         self._mk_data = MikrotikSwosLiteData(hass, config_entry)
 

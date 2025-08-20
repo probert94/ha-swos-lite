@@ -6,9 +6,14 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
+    CONF_USERNAME,
+)
 
-from .const import DEFAULT_NAME, DOMAIN
+from .const import DEFAULT_NAME, DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .coordinator import test_connection
 from .errors import AuthError, CannotConnect
 
@@ -47,6 +52,9 @@ class MikrotikSwosLiteConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_HOST, default=host): str,
                     vol.Required(CONF_USERNAME, default="admin"): str,
                     vol.Required(CONF_PASSWORD): str,
+                    vol.Optional(
+                        CONF_SCAN_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
+                    ): vol.All(vol.Coerce(int), vol.Range(min=5)),
                 }
             ),
             errors=errors,
