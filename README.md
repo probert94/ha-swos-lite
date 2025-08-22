@@ -41,3 +41,10 @@ It also reads information about the ports, including the customized name which i
 - PoE power
 - PoE current
 - PoE voltage
+
+### Compatibility
+
+The integration has been tested with:
+| Model | Versions |
+| - | - |
+| CSS610-8P-2S+ | 2.20 |
