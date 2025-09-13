@@ -15,7 +15,7 @@ To install the integration in your Home Assistant instance, use this My button:
 Alternatively, you can add it to HACS by following this steps:
 1. Go to HACS
 2. Click on the 3 points in the upper right corner and click `Custom repositories`
-3. Patse https://github.com/probert94/ha-swos-lite into `Repository` and select type `Integration`
+3. Paste https://github.com/probert94/ha-swos-lite into `Repository` and select type `Integration`
 4. Click `ADD` and check if the repository can be found in HACS
 5. Select it and click `INSTALL`
 
@@ -39,3 +39,12 @@ It also reads information about the ports, including the customized name which i
 
 ### Sensors
 - PoE power
+- PoE current
+- PoE voltage
+
+### Compatibility
+
+The integration has been tested with:
+| Model | Versions |
+| - | - |
+| CSS610-8P-2S+ | 2.20 |
