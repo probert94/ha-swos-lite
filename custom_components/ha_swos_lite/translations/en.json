@@ -17,5 +17,18 @@
                 }
             }
         }
+    },
+    "entity": {
+        "sensor": {
+            "poe_power": {
+                "name": "P{port_num} - {port_name} Power"
+            },
+            "poe_current": {
+                "name": "P{port_num} - {port_name} Current"
+            },
+            "poe_voltage": {
+                "name": "P{port_num} - {port_name} Voltage"
+            }
+        }
     }
 }
