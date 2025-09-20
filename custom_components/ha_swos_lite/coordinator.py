@@ -40,13 +40,18 @@ class MikrotikSwosLiteData:
         self.config_entry = config_entry
         self.client = _create_client(config_entry.data)
         self.device: SystemEndpoint | None = None
+        self.sys: SystemEndpoint | None = None
         self.link: LinkEndpoint | None = None
         self.poe: PoEEndpoint | None = None
 
     async def setup(self):
         """Set up the data class by loading system information."""
-        self.device = await self.client.fetch(SystemEndpoint)
+        self.device = self.sys = await self.client.fetch(SystemEndpoint)
         self.link = await self.client.fetch(LinkEndpoint)
+
+    async def updateHealth(self):
+        """Fetch system data."""
+        self.sys = await self.client.fetch(SystemEndpoint)
 
     async def updatePoE(self):
         """Fetch PoE data."""
@@ -121,6 +126,7 @@ class MikrotikSwosLiteCoordinator(DataUpdateCoordinator[None]):
     async def _async_update_data(self):
         try:
             await self._mk_data.updatePoE()
+            await self._mk_data.updateHealth()
         except HTTPStatusError as err:
             if err.response.status_code == 401:
                 raise ConfigEntryAuthFailed from err

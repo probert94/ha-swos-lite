@@ -14,6 +14,7 @@ from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
     UnitOfPower,
+    UnitOfTemperature,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -32,6 +33,69 @@ class MikrotikSwOSLiteEntityDescription(SensorEntityDescription):
     endpoint: str
     property: str
 
+
+GLOBAL_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
+    MikrotikSwOSLiteEntityDescription(
+        key="cpu_temperature",
+        translation_key="cpu_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=0,
+        endpoint="sys",
+        property="cpuTemp",
+    ),
+    MikrotikSwOSLiteEntityDescription(
+        key="psu1_current",
+        translation_key="psu1_current",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
+        suggested_display_precision=0,
+        endpoint="sys",
+        property="psu1Current",
+    ),
+    MikrotikSwOSLiteEntityDescription(
+        key="psu1_voltage",
+        translation_key="psu1_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        suggested_display_precision=2,
+        endpoint="sys",
+        property="psu1Voltage",
+    ),
+    MikrotikSwOSLiteEntityDescription(
+        key="psu2_current",
+        translation_key="psu2_current",
+        device_class=SensorDeviceClass.CURRENT,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
+        suggested_display_precision=0,
+        endpoint="sys",
+        property="psu2Current",
+    ),
+    MikrotikSwOSLiteEntityDescription(
+        key="psu2_voltage",
+        translation_key="psu2_voltage",
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        suggested_display_precision=2,
+        endpoint="sys",
+        property="psu2Voltage",
+    ),
+    MikrotikSwOSLiteEntityDescription(
+        key="total_power",
+        translation_key="total_power",
+        device_class=SensorDeviceClass.POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        suggested_display_precision=1,
+        endpoint="sys",
+        property="power_consumption",
+    ),
+)
 
 PORT_SENSORS: tuple[MikrotikSwOSLiteEntityDescription, ...] = (
     MikrotikSwOSLiteEntityDescription(
@@ -87,6 +151,12 @@ async def async_setup_entry(
 
     async_add_entities(
         [
+            MikrotikSwosLiteSensor(coordinator, device, global_sensor)
+            for global_sensor in GLOBAL_SENSORS
+        ]
+    )
+    async_add_entities(
+        [
             MikrotikSwosLitePortSensor(coordinator, device, port_sensor, port)
             for port_sensor in PORT_SENSORS
             for port in coordinator.api.ports
@@ -94,9 +164,36 @@ async def async_setup_entry(
     )
 
 
-class MikrotikSwosLitePortSensor(
+class MikrotikSwosLiteSensor(
     CoordinatorEntity[MikrotikSwosLiteCoordinator], SensorEntity
 ):
+    """Representation of a Mikrotik SwitchOS Lite Sensor."""
+
+    entity_description: MikrotikSwOSLiteEntityDescription
+
+    def __init__(
+        self,
+        coordinator: MikrotikSwosLiteCoordinator,
+        device: DeviceInfo,
+        entity_description: MikrotikSwOSLiteEntityDescription,
+    ) -> None:
+        """Initialize the sensor entity."""
+        super().__init__(coordinator)
+        self.entity_description = entity_description
+        self.has_entity_name = True
+        self._attr_unique_id = f"{coordinator.serial_num}_{entity_description.key}"
+        self._attr_device_info = device
+
+    @property
+    def native_value(self) -> float:
+        """Returns the current value from the API."""
+        return getattr(
+            getattr(self.coordinator.api, self.entity_description.endpoint),
+            self.entity_description.property,
+        )
+
+
+class MikrotikSwosLitePortSensor(MikrotikSwosLiteSensor):
     """Representation of a Mikrotik SwitchOS Lite Port Sensor."""
 
     entity_description: MikrotikSwOSLiteEntityDescription
@@ -109,10 +206,8 @@ class MikrotikSwosLitePortSensor(
         port: Port,
     ) -> None:
         """Initialize the sensor entity."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, device, entity_description)
         self.port = port
-        self.entity_description = entity_description
-        self.has_entity_name = True
         self._attr_translation_placeholders = {
             "port_num": f"{(port.num + 1):02d}",
             "port_name": port.name,
@@ -120,7 +215,6 @@ class MikrotikSwosLitePortSensor(
         self._attr_unique_id = (
             f"{coordinator.serial_num}_{port.num}_{entity_description.key}"
         )
-        self._attr_device_info = device
 
     @property
     def native_value(self) -> float:

@@ -20,6 +20,24 @@
     },
     "entity": {
         "sensor": {
+            "cpu_temperature": {
+                "name": "CPU temperature"
+            },
+            "psu1_current": {
+                "name": "Power supply 1 - current"
+            },
+            "psu1_voltage": {
+                "name": "Power supply 1 - voltage"
+            },
+            "psu2_current": {
+                "name": "Power supply 2 - current"
+            },
+            "psu2_voltage": {
+                "name": "Power supply 2 - voltage"
+            },
+            "total_power": {
+                "name": "Power"
+            },
             "poe_power": {
                 "name": "P{port_num} - {port_name} Power"
             },
