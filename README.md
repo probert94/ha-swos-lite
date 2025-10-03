@@ -7,6 +7,10 @@ Home Assistant integration for Mikrotik SwitchOS Lite
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/probert94/ha-swos-lite?style=for-the-badge)
 [![GitHub Release](https://img.shields.io/github/v/release/probert94/ha-swos-lite?style=for-the-badge)](https://github.com/probert94/ha-swos-lite/releases)
 
+> [!CAUTION]
+> This integration is **deprecated** and no longer maintained.  
+> It has been replaced by [ha-switchos](https://github.com/probert94/ha-switchos), which supports **SwitchOS** and **SwitchOS Lite**.
+
 ## HACS install
 To install the integration in your Home Assistant instance, use this My button:
 
